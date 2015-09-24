@@ -1,14 +1,15 @@
-#include "CKmer.h"
+#include "CKmers.h"
 
-CKmer::CKmer(int size) {
+CKmers::CKmers(int size) {
 	this->order = size;
 }
 
-CKmer::~CKmer() {
+CKmers::~CKmers() {
 	this->order = 0;
+	this->kmerList.clear();
 }
 
-char CKmer::next(char current) {
+char CKmers::next(char current) {
 
 	switch(current) {
 	case 'A':
@@ -25,7 +26,7 @@ char CKmer::next(char current) {
 
 }
 
-void CKmer::successor(string* current, int* pos) {
+void CKmers::successor(string* current, int* pos) {
 	char next;
 
 	next = this->next((char)(*current)[*pos]);
@@ -47,7 +48,7 @@ void CKmer::successor(string* current, int* pos) {
 
 }
 
-bool CKmer::generateKmerList() {
+bool CKmers::generateKmerList() {
 	int kmerPos = this->order; //The kmers will have length k+1
 	string current = "";
 	int index = 0;
@@ -70,7 +71,17 @@ bool CKmer::generateKmerList() {
 	return true;
 }
 
-int main(int argc, char *argv[]) {
-	CKmer *kmer = new CKmer(1);
-	kmer->generateKmerList();
+map<string, int> CKmers::getKmerList() {
+	//Initialize it if it hasn't been already done
+	if (this->kmerList.empty()) {
+		this->generateKmerList();
+	}
+	return this->kmerList;
 }
+
+/*
+int main(int argc, char *argv[]) {
+	CKmers *kmers = new CKmers(1);
+	//kmers->generateKmerList();
+}
+*/

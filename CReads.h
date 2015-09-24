@@ -16,12 +16,13 @@ using namespace std;
 
 class CReads {
 public:
-	CReads(const char* inputFile);
-	bool LoadReads();
+	CReads(string inputFile);
 	virtual ~CReads();
+	vector<string> getSequences();
 private:
 	ifstream input;
 	vector<string> sequences;
+	bool LoadReads();
 };
 
 #endif /* CREADS_H_ */
