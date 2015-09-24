@@ -1,3 +1,12 @@
+/*
+ *      Author: 	Vanessa Aguiar-Pulido
+ *      			Postdoctoral Research Associate
+ *      			Bioinformatics Research Group (BioRG)
+ *      			Florida International University (FIU)
+ *      			Miami, FL, USA
+ *
+ *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
+ */
 
 #include<stdio.h>
 #include <iostream>

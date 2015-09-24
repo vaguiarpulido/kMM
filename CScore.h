@@ -1,8 +1,11 @@
 /*
- * CScore.h
+ *      Author: 	Vanessa Aguiar-Pulido
+ *      			Postdoctoral Research Associate
+ *      			Bioinformatics Research Group (BioRG)
+ *      			Florida International University (FIU)
+ *      			Miami, FL, USA
  *
- *  Created on: 23 de sept. de 2015
- *      Author: vanessa
+ *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
  */
 
 #include<stdio.h>

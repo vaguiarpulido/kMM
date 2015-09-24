@@ -1,19 +1,22 @@
 /*
- * CScore.cpp
+ *      Author: 	Vanessa Aguiar-Pulido
+ *      			Postdoctoral Research Associate
+ *      			Bioinformatics Research Group (BioRG)
+ *      			Florida International University (FIU)
+ *      			Miami, FL, USA
  *
- *  Created on: 23 de sept. de 2015
- *      Author: vanessa
+ *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
  */
 
 #include "CScore.h"
 
 CScore::CScore() {
-	// TODO Auto-generated constructor stub
+
 
 }
 
 CScore::~CScore() {
-	// TODO Auto-generated destructor stub
+
 }
 
 float CScore::scoreRead(string read, int order, map<string, int> kmerMap, vector<float> model) {

@@ -1,3 +1,13 @@
+/*
+ *      Author: 	Vanessa Aguiar-Pulido
+ *      			Postdoctoral Research Associate
+ *      			Bioinformatics Research Group (BioRG)
+ *      			Florida International University (FIU)
+ *      			Miami, FL, USA
+ *
+ *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
+ */
+
 #include "CKmers.h"
 
 CKmers::CKmers(int size) {
