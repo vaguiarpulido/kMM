@@ -117,7 +117,7 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 
 int main(int argc, char* argv[]) {
 
-	string pathToModels = "/Users/vanessa/Documents/Work/ResearchInProgress/BioRG/Metagenomics/Azad/smallList/";
+	string pathToModels = "/Users/vanessa/Documents/Work/ResearchInProgress/BioRG/Metagenomics/smallList/";
 	CScore* s = new CScore();
 	s->scoreModels(pathToModels,"test.txt","scores.txt",4);
 
