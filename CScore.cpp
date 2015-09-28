@@ -9,6 +9,7 @@
  */
 
 #include "CScore.h"
+#include <sys/time.h>
 
 CScore::CScore() {
 
@@ -21,18 +22,31 @@ CScore::~CScore() {
 
 float CScore::scoreRead(string read, int order, map<string, int> kmerMap, vector<float> model) {
 	float score = 0.0;
-	string tmpKmer = read.substr(0, order+1); //From the beginning, take k+1 characters
-	int mappedIndex = kmerMap.at(tmpKmer); //This will return the position of the kmer
-	score = score + model.at(mappedIndex);
 
-	for(int j=order; j<read.length()-order+1; j++) { //Calculate the score of a read
+	//We need to calculate the initial probabilities
+	string tmpKmer = read.substr(0, order); //From the beginning, take k characters
+	int mappedIndex = kmerMap.at(tmpKmer.substr(0,order));
+	score += model.at(mappedIndex);
+
+	//cout << "tmpKmer " << order << ": " << tmpKmer << "\n";
+
+	tmpKmer.push_back((char)read.at(order)); //First (k+1)-mer
+
+	for(int j=order+1; j<read.length(); j++) { //Calculate the score of a read
 		//cout << "tmpKmer " << j << ": " << tmpKmer << "\n";
+		mappedIndex = kmerMap.at(tmpKmer); //This will return the position of the kmer
+		score += model.at(mappedIndex);
+		//cout << "Partial score "<< j << ": " << score << "\n";
 		tmpKmer.erase(tmpKmer.begin());
 		tmpKmer.push_back((char)read.at(j));
-		mappedIndex = kmerMap.at(tmpKmer); //This will return the position of the kmer
-		score = score + model.at(mappedIndex);
-		//cout << "Partial score "<< j << ": " << tmpScore << "\n";
 	}
+
+	//cout << "tmpKmer " << read.length() << ": " << tmpKmer << "\n";
+
+	//We need to add the last kmer
+	mappedIndex = kmerMap.at(tmpKmer);
+	score += model.at(mappedIndex);
+
 	//cout << "Score for read "<< read << ": " << score << "\n";
 
 	return score;
@@ -60,23 +74,27 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 
 	//Open the file containing the names of the models
 	listFile.open("models.txt");
+	//cout << "Let's open the models file\n";
 
 	if (listFile.is_open()) {
 
 		while(getline(listFile,modelName)) { //Retrieve the name of the model
 			modelFull = modelsPath + modelName;
+			//cout << "ModelFull: " << modelFull << "\n";
 			modelFile.open(modelFull.c_str()); //Open the file that contains the probabilities
 
 			if (modelFile.is_open()) {
-				//cout << "Model: " << modelName << "\n";
+				cout << "Model: " << modelName << "\n";
 				while(modelFile >> index >> value) {
 					model.push_back(value); //Store the model values
 					//cout << "Model value: " << value << "\n";
 				}
+				//cout << "Model size: " << model.size() << "\n";
 
 				//For each read calculate the score for the model
 				for(int i=0; i<reads->getSequences().size(); i++) {
 					tmpScore = this->scoreRead((string)reads->getSequences().at(i), order, kmers->getKmerList(), model);
+					cout << "Score for read "<< i << ": " << tmpScore << "\n";
 
 					//Replace the score stored if the new score is higher
 					if(this->scores.size() < reads->getSequences().size()) {
@@ -117,9 +135,23 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 
 int main(int argc, char* argv[]) {
 
-	string pathToModels = "/Users/vanessa/Documents/Work/ResearchInProgress/BioRG/Metagenomics/smallList/";
+	//string pathToModels = "/scratch/giri_projects/vanessa/Azad/scripts/model_database/";
+	//string pathToModels = "/Users/vanessa/Documents/Work/ResearchInProgress/BioRG/Metagenomics/smallList/";
+	string pathToModels = "/Users/vanessa/Documents/Work/ResearchInProgress/BioRG/Metagenomics/signature_6order/";
 	CScore* s = new CScore();
-	s->scoreModels(pathToModels,"test.txt","scores.txt",4);
+	struct timeval tv1, tv2;
+	gettimeofday(&tv1, NULL);
+
+	//for(int i=0; i<1000; i++) {
+		//s->scoreModels(pathToModels,"test.fa","scores.txt",6);
+	//}
+
+	s->scoreModels(pathToModels,"test.fa","scores.txt",6);
+	//s->scoreModels(pathToModels,"test.fa","scores.txt",8);
+
+	gettimeofday(&tv2, NULL);
+	double tm = (double) (tv2.tv_usec - tv1.tv_usec)/1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
+	cout << "Time taken in execution = " << tm << " seconds\n";
 
 	return 0;
 }

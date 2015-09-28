@@ -22,9 +22,11 @@ public:
 	CReads(string inputFile);
 	virtual ~CReads();
 	vector<string> getSequences();
+
 private:
 	ifstream input;
 	vector<string> sequences;
+
 	bool LoadReads();
 };
 

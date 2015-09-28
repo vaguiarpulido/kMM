@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <math.h>
 using namespace std;
 
 #ifndef CKMERS_H_
@@ -24,9 +25,10 @@ public:
 	map<string, int> getKmerList();
 private:
 	int order;
+	map<string, int> kmerList;
+
 	char next(char current);
 	void successor(string* current, int* pos);
-	map<string, int> kmerList;
 	bool generateKmerList();
 };
 

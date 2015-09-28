@@ -27,10 +27,12 @@ public:
 	CScore();
 	virtual ~CScore();
 	void scoreModels(string modelsPath, string readsFileName, string outputFile, int order);
+
 private:
 	vector<float> scores;
 	vector<string> modelNames;
 	map<string, int> kmerMap;
+
 	float scoreRead(string read, int order, map<string, int> kmerMap, vector<float> model);
 };
 

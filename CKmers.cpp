@@ -23,12 +23,12 @@ char CKmers::next(char current) {
 
 	switch(current) {
 	case 'A':
-		return 'C';
-	case 'C':
-		return 'G';
-	case 'G':
 		return 'T';
 	case 'T':
+		return 'G';
+	case 'G':
+		return 'C';
+	case 'C':
 		return 'A';
 	default:
 		return 'N';
@@ -62,6 +62,7 @@ bool CKmers::generateKmerList() {
 	int kmerPos = this->order; //The kmers will have length k+1
 	string current = "";
 	int index = 0;
+	int indexIniProb = pow(4, this->order+1);
 
 	if (this->order<=0) return false;
 
@@ -74,6 +75,10 @@ bool CKmers::generateKmerList() {
 	while (kmerPos >= 0) {
 		this->kmerList[current] = index;
 		index++;
+		if(index % 4 == 0) {
+			this->kmerList[current.substr(0,this->order)] = indexIniProb;
+			indexIniProb++;
+		}
 		//cout << "Element " << index << ":" << current << "\n";
 		this->successor(&current,&kmerPos);
 	}
@@ -91,7 +96,10 @@ map<string, int> CKmers::getKmerList() {
 
 /*
 int main(int argc, char *argv[]) {
-	CKmers *kmers = new CKmers(1);
-	//kmers->generateKmerList();
+	CKmers *kmers = new CKmers(6);
+	map<string,int> kmerMap = kmers->getKmerList();
+	  // show content:
+	  for (map<string,int>::iterator it=kmerMap.begin(); it!=kmerMap.end(); ++it)
+	    std::cout << it->first << " \t " << it->second << '\n';
 }
 */
