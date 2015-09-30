@@ -22,11 +22,22 @@ CScore::~CScore() {
 
 float CScore::scoreRead(string read, int order, map<string, int> kmerMap, vector<float> model) {
 	float score = 0.0;
+	bool first = true;
+	int mappedIndex = -1;
+	string tmpKmer = read.substr(0, order); //From the beginning, take k characters;
 
 	//We need to calculate the initial probabilities
-	string tmpKmer = read.substr(0, order); //From the beginning, take k characters
-	int mappedIndex = kmerMap.at(tmpKmer.substr(0,order));
-	score += model.at(mappedIndex);
+	while(first) {
+		try {
+			mappedIndex = kmerMap.at(tmpKmer);
+			score += model.at(mappedIndex);
+			first = false;
+		} catch (...) { //If there is an N in the initial k-mer, iterate past it
+			tmpKmer.erase(tmpKmer.begin());
+			tmpKmer.push_back((char)read.at(order));
+			order++;
+		}
+	}
 
 	//cout << "tmpKmer " << order << ": " << tmpKmer << "\n";
 
@@ -34,9 +45,11 @@ float CScore::scoreRead(string read, int order, map<string, int> kmerMap, vector
 
 	for(int j=order+1; j<read.length(); j++) { //Calculate the score of a read
 		//cout << "tmpKmer " << j << ": " << tmpKmer << "\n";
-		mappedIndex = kmerMap.at(tmpKmer); //This will return the position of the kmer
-		score += model.at(mappedIndex);
-		//cout << "Partial score "<< j << ": " << score << "\n";
+		try {
+			mappedIndex = kmerMap.at(tmpKmer); //This will return the position of the kmer
+			score += model.at(mappedIndex);
+			//cout << "Partial score "<< j << ": " << score << "\n";
+		} catch (...) {} //If there's an N, just skip it
 		tmpKmer.erase(tmpKmer.begin());
 		tmpKmer.push_back((char)read.at(j));
 	}
@@ -44,8 +57,10 @@ float CScore::scoreRead(string read, int order, map<string, int> kmerMap, vector
 	//cout << "tmpKmer " << read.length() << ": " << tmpKmer << "\n";
 
 	//We need to add the last kmer
-	mappedIndex = kmerMap.at(tmpKmer);
-	score += model.at(mappedIndex);
+	try {
+		mappedIndex = kmerMap.at(tmpKmer);
+		score += model.at(mappedIndex);
+	} catch (...) {} //If there's an N, just skip it
 
 	//cout << "Score for read "<< read << ": " << score << "\n";
 
@@ -84,31 +99,33 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 			modelFile.open(modelFull.c_str()); //Open the file that contains the probabilities
 
 			if (modelFile.is_open()) {
-				cout << "Model: " << modelName << "\n";
-				while(modelFile >> index >> value) {
-					model.push_back(value); //Store the model values
-					//cout << "Model value: " << value << "\n";
-				}
-				//cout << "Model size: " << model.size() << "\n";
-
-				//For each read calculate the score for the model
-				for(int i=0; i<reads->getSequences().size(); i++) {
-					tmpScore = this->scoreRead((string)reads->getSequences().at(i), order, kmers->getKmerList(), model);
-					cout << "Score for read "<< i << ": " << tmpScore << "\n";
-
-					//Replace the score stored if the new score is higher
-					if(this->scores.size() < reads->getSequences().size()) {
-						this->scores.push_back(tmpScore);
-						this->modelNames.push_back((string)modelName.substr(0,modelName.find(".")));
+				try { //In case there's something in the model's folder that shouldn't be there
+					cout << "Model: " << modelName << "\n";
+					while(modelFile >> index >> value) {
+						model.push_back(value); //Store the model values
+						//cout << "Model value: " << value << "\n";
 					}
-					else {
-						if (tmpScore > this->scores.at(i)) {
-							this->scores.at(i) = tmpScore;
-							this->modelNames.at(i) = modelName.substr(0,modelName.find("."));
+					//cout << "Model size: " << model.size() << "\n";
+
+					//For each read calculate the score for the model
+					for(int i=0; i<reads->getSequences().size(); i++) {
+						tmpScore = this->scoreRead((string)reads->getSequences().at(i), order, kmers->getKmerList(), model);
+						cout << "Score for read "<< i << ": " << tmpScore << "\n";
+
+						//Replace the score stored if the new score is higher
+						if(this->scores.size() < reads->getSequences().size()) {
+							this->scores.push_back(tmpScore);
+							this->modelNames.push_back((string)modelName.substr(0,modelName.find(".")));
 						}
-					}
+						else {
+							if (tmpScore > this->scores.at(i)) {
+								this->scores.at(i) = tmpScore;
+								this->modelNames.at(i) = modelName.substr(0,modelName.find("."));
+							}
+						}
 
-				} //End for scoring reads
+					} //End while scoring reads
+				} catch(...) {}
 
 				modelFile.close();
 				model.clear();
@@ -132,7 +149,7 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 	kmers->~CKmers();
 }
 
-
+/*
 int main(int argc, char* argv[]) {
 
 	//string pathToModels = "/scratch/giri_projects/vanessa/Azad/scripts/model_database/";
@@ -155,4 +172,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-
+*/

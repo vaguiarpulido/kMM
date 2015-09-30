@@ -10,8 +10,8 @@
 
 #include "CKmers.h"
 
-CKmers::CKmers(int size) {
-	this->order = size;
+CKmers::CKmers(int order) {
+	this->order = order;
 }
 
 CKmers::~CKmers() {
