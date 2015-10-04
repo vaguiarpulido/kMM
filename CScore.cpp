@@ -78,12 +78,15 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 	string tmpKmer="", tmpRead="";
 	float tmpScore=0.0;
 	//Prepare to load the reads
-	CReads* reads = new CReads(readsFileName);
+	CSequences* reads = new CSequences(readsFileName);
 	//Prepare to get the list of possible kmers for a model
 	CKmers* kmers = new CKmers(order);
 
 
 	//Get the full list of models
+	if(modelsPath.compare(modelsPath.length()-1,1,"/") !=0) {
+		modelsPath += "/";
+	}
 	string command = "ls "+ modelsPath +" > models.txt";
 	system(command.c_str());
 
@@ -145,7 +148,7 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 		listFile.close();
 	} //End if list of models was read
 
-	reads->~CReads();
+	reads->~CSequences();
 	kmers->~CKmers();
 }
 

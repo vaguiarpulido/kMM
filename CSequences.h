@@ -8,8 +8,8 @@
  *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
  */
 
-#ifndef CREADS_H_
-#define CREADS_H_
+#ifndef CSEQUENCES_H_
+#define CSEQUENCES_H_
 
 #include <iostream>
 #include<stdio.h>
@@ -17,17 +17,17 @@
 #include <vector>
 using namespace std;
 
-class CReads {
+class CSequences {
 public:
-	CReads(string inputFile);
-	virtual ~CReads();
+	CSequences(string inputFile);
+	virtual ~CSequences();
 	vector<string> getSequences();
 
 private:
 	ifstream input;
 	vector<string> sequences;
 
-	bool LoadReads();
+	bool LoadSequences();
 };
 
-#endif /* CREADS_H_ */
+#endif /* CSEQUENCES_H_ */

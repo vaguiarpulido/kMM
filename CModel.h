@@ -13,7 +13,7 @@
 
 #include <iostream>
 #include <fstream>
-#include<stdio.h>
+#include <stdio.h>
 #include <vector>
 #include <math.h>
 #include "CKmers.h"

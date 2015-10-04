@@ -14,8 +14,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "CReads.h"
 #include "CKmers.h"
+#include "CSequences.h"
 
 using namespace std;
 

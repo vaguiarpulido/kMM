@@ -8,13 +8,13 @@
  *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
  */
 
-#include "CReads.h"
+#include "CSequences.h"
 
-CReads::CReads(string inputFile) {
+CSequences::CSequences(string inputFile) {
 	this->input.open(inputFile.c_str());
 }
 
-bool CReads::LoadReads()
+bool CSequences::LoadSequences()
 {
 	if (!this->input.is_open()) return false;
 	string sequence="";
@@ -50,13 +50,13 @@ bool CReads::LoadReads()
 		//cout << "Sequence: " << sequence << "\n";
 	}
 
-	//cout << "Reads: " << this->sequences.size() << "\n";
+	//cout << "Sequences: " << this->sequences.size() << "\n";
 
 	return true;
 }
 
 
-CReads::~CReads() {
+CSequences::~CSequences() {
 	if (this->input.is_open()) {
 		input.close();
 	}
@@ -64,9 +64,9 @@ CReads::~CReads() {
 }
 
 
-vector<string> CReads::getSequences() {
+vector<string> CSequences::getSequences() {
 	if (this->sequences.empty()) { //First time initialization
-		this->LoadReads();
+		this->LoadSequences();
 	}
 
 	return this->sequences;
@@ -74,8 +74,8 @@ vector<string> CReads::getSequences() {
 
 /*
 int main(int argc, char *argv[]) {
-	CReads *reads = new CReads("test.txt");
+	CSequences *reads = new CSequences("test.txt");
 	reads->getSequences();
-	reads->~CReads();
+	reads->~CSequences();
 }
 */
