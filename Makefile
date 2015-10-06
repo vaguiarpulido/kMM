@@ -16,6 +16,7 @@ OFILES =        CKmers.o \
         CModel.o \
         CSequences.o \
         CScore.o \
+	scoreReads.o \
         #scoreGenome.o \
         test.o
 
@@ -37,6 +38,9 @@ CSequences.o:       CSequences.h CSequences.cpp
 
 CScore.o:       CScore.h CScore.cpp
 	$(CC) -c CScore.cpp
+
+scoreReads.o:	scoreReads.cu
+	nvcc -c scoreReads.cu
 
 clean:
 	rm *.o
