@@ -5,29 +5,30 @@
  *      			Florida International University (FIU)
  *      			Miami, FL, USA
  *
- *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
+ *     	Contact: 	vaguiarp@fiu.edu or giri@fiu.edu
  */
 
 #ifndef CSEQUENCES_H_
 #define CSEQUENCES_H_
 
 #include <iostream>
-#include<stdio.h>
+#include <stdio.h>
+#include <string.h>
 #include <fstream>
 #include <vector>
 using namespace std;
 
 class CSequences {
 public:
-	CSequences(string inputFile);
+	CSequences(char * inputFile);
 	virtual ~CSequences();
-	vector<string> getSequences();
+	char * getGenome();
 
 private:
 	ifstream input;
-	vector<string> sequences;
-
-	bool LoadSequences();
+	// vector<string> sequences;
+	char * genomeSeq;
+	// bool LoadSequences();
 };
 
 #endif /* CSEQUENCES_H_ */
