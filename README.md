@@ -4,6 +4,6 @@ The objective of this project is to provide tools for, on one hand, generating k
 
 #Author information
 
-This project has been developed as part of ongoing research at the Bioinformatics Research Group (BioRG) from Florida International University (FIU). This group is headed by Prof. Giri Narasimhan. The C++ code was programmed by Vanessa Aguiar-Pulido (Ph.D. in Computer Science) and the Cuda code by Trevor Cickosvki (Ph.D. in Computer Science).
+This project has been developed as part of ongoing research at the Bioinformatics Research Group (BioRG) from Florida International University (FIU). This group is headed by Prof. Giri Narasimhan. The C++ code was programmed by Vanessa Aguiar-Pulido (Ph.D. in Computer Science) and Giri Narasimhan (Ph.D. in Computer Science), and the Cuda code by Trevor Cickosvki (Ph.D. in Computer Science).
 
 
