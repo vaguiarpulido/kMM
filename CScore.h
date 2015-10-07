@@ -8,7 +8,7 @@
  *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
  */
 
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
