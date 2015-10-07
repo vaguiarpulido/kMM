@@ -72,11 +72,13 @@ void CModel::calculateProbabilities() {
 	cout << "Calculating probabilities...\n";
 	  for (int i=0; i<=length-4; i+=4) {
 		  sum = this->frequency.at(i) + this->frequency.at(i+1) + this->frequency.at(i+2) + this->frequency.at(i+3);
-		  totalSum +=  sum;
 		  for(int j=i; j<i+4; j++) {
 			  this->logProbabilities.at(j) = log((float)this->frequency.at(j) / sum);
 			  //cout << i << "," << j << " = "<< this->logProbabilities.at(j) << "\n";
 		  }
+	  }
+	  for(int i=length; i<this->frequency.size(); i++) {
+		  totalSum +=  this->frequency.at(i);
 	  }
 	  for(int i=length; i<this->frequency.size(); i++) {
 		  //this->logProbabilities.at(i) = log((float) this->frequency.at(i) / (pow(4,this->order) - this->order));
