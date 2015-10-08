@@ -13,22 +13,23 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <string.h>
 #include <fstream>
 #include <vector>
+#include <string>
 using namespace std;
 
 class CSequences {
 public:
-	CSequences(char * inputFile);
+	CSequences(string inputFile);
 	virtual ~CSequences();
+	vector<string> getSequences();
 	char * getGenome();
 
 private:
 	ifstream input;
-	// vector<string> sequences;
-	char * genomeSeq;
-	// bool LoadSequences();
+	vector<string> sequences;
+
+	bool LoadSequences();
 };
 
 #endif /* CSEQUENCES_H_ */
