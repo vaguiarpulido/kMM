@@ -10,68 +10,77 @@
 
 #include "CSequences.h"
 
-CSequences::CSequences(char * inputFile) {
-  this->input.open(inputFile);
+CSequences::CSequences(string inputFile) {
+	this->input.open(inputFile.c_str());
 }
 
-/*
 bool CSequences::LoadSequences()
 {
-  if (!this->input.is_open()) return false;
-  string sequence="";
-  char c;
-  bool first=true;
-  
-  while (this->input.get(c)) {
-    c = toupper(c); //Putting everything to upper case
-    switch(c) {
-    case 'A': case 'C': case 'G': case 'T': case 'N':
-      sequence.push_back(c);
-      break;
-    case '>':
-      if (first) {
-	first = false;
-      } else { //End of sequence
-	if (!sequence.empty()) {
-	  this->sequences.push_back(sequence);
-	  //cout << "Sequence: " << sequence << "\n";
-	  sequence.clear();
+	if (!this->input.is_open()) return false;
+	string sequence="";
+	char c;
+	bool first=true;
+
+	while (this->input.get(c)) {
+		c = toupper(c); //Putting everything to upper case
+		switch(c) {
+		case 'A': case 'C': case 'G': case 'T': case 'N':
+			sequence.push_back(c);
+			break;
+		case '>':
+			if (first) {
+				first = false;
+			} else { //End of sequence
+				if (!sequence.empty()) {
+					this->sequences.push_back(sequence);
+					//cout << "Sequence: " << sequence << "\n";
+					sequence.clear();
+				}
+			}
+			while(this->input.get(c)) { //Skip lines with names
+				if (c=='\n') break;
+			}
+			break;
+		default:
+			break;
+		}
 	}
-      }
-      while(this->input.get(c)) { //Skip lines with names
-	if (c=='\n') break;
-      }
-      break;
-    default:
-      break;
-    }
-  }
-  if (!sequence.empty()) { //Save last line
-    this->sequences.push_back(sequence);
-    //cout << "Sequence: " << sequence << "\n";
-  }
-  //cout << "Sequences: " << this->sequences.size() << "\n";  
-  return true;
+	if (!sequence.empty()) { //Save last line
+		this->sequences.push_back(sequence);
+		//cout << "Sequence: " << sequence << "\n";
+	}
+
+	//cout << "Sequences: " << this->sequences.size() << "\n";
+
+	return true;
 }
-*/
+
 
 CSequences::~CSequences() {
-  if (this->input.is_open()) {
-    input.close();
-  }
-  // this->sequences.clear();
+	if (this->input.is_open()) {
+		input.close();
+	}
+	this->sequences.clear();
 }
 
+
+vector<string> CSequences::getSequences() {
+	if (this->sequences.empty()) { //First time initialization
+		this->LoadSequences();
+	}
+
+	return this->sequences;
+}
 
 char * CSequences::getGenome() {
   if (!input.is_open()) {
     cout << "Could not open genome file " << endl;
-    return 0; 
-  } 
-	  
+    return 0;
+  }
+
   char ch;
   string genome;
-  getline(input, genome); 
+  getline(input, genome);
   genome = ""; // discard first line
   while (input.get(ch)) {
     if (ch != '\n') {
@@ -80,12 +89,12 @@ char * CSequences::getGenome() {
   }
 
   int len = genome.length();
-  genomeSeq = new char[len];
+  char* genomeSeq = new char[len];
   strcpy(genomeSeq, genome.c_str());
   for (int i = 0; i < 100; i++) {
     cout << genomeSeq[i];
   }
   cout << endl << "Genome of length " << len << " read in" << endl;
 
-  return this->genomeSeq;
+  return genomeSeq;
 }
