@@ -12,6 +12,7 @@
 #include <sys/time.h>
 
 #include "scoreReads.h"
+#include <math.h>
 
 CScore::CScore() {
 
@@ -85,18 +86,28 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 
         // GPU arrays
         int num_seq = reads->getSequences().size();
-        int read_length = reads->getSequences().size(); // TMC for now assuming same length
+        int read_length = reads->getSequences()[0].size(); // TMC for now assuming same length
         int nucleotides = num_seq*read_length;
 	float* cpu_scores = (float*) malloc(num_seq*sizeof(float));
  
+        char* cpu_genome = (char*) malloc(nucleotides*sizeof(char));
+        // data() does not work, have to copy manually for now.
+        for (int i = 0; i < num_seq; i++) {
+	   cout << "Sequence " << i << ": " << reads->getSequences()[i] << endl;
+           for (int j = 0; j < read_length; j++) {
+              cpu_genome[i*read_length+j] = reads->getSequences()[i][j];
+           }
+        }
+        cout << "CPU GENOME: " << string(cpu_genome) << endl;
+
         char* gpu_genome;
         cudaMalloc((void**) &gpu_genome, nucleotides*sizeof(char));
-        cudaMemcpy(gpu_genome, reads->getSequences().data(), nucleotides*sizeof(char), cudaMemcpyHostToDevice); // TMC I know this works for vectors of ints, need to check vectors of strings
+        cudaMemcpy(gpu_genome, cpu_genome, nucleotides*sizeof(char), cudaMemcpyHostToDevice); // TMC I know this works for vectors of ints, need to check vectors of strings
 
 	//Prepare to get the list of possible kmers for a model
 	CKmers* kmers = new CKmers(order);
 
-
+        order++;
 	//Get the full list of models
 	if(modelsPath.compare(modelsPath.length()-1,1,"/") !=0) {
 		modelsPath += "/";
@@ -117,49 +128,72 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 
 			if (modelFile.is_open()) {
 				try { //In case there's something in the model's folder that shouldn't be there
+					int num_models = pow(4,order) + pow(4, order-1);
+                                        float* cpu_model = (float*) malloc(num_models * sizeof(float));
 					cout << "Model: " << modelName << "\n";
-					while(modelFile >> index >> value) {
-						model.push_back(value); //Store the model values
+                                        int i=0;
+					while(i < num_models && modelFile >> index >> value) {
+                                                cpu_model[i] = value;
+						//model.push_back(value); //Store the model values
 						//cout << "Model value: " << value << "\n";
+                                                i++;
 					}
-					int num_models = model.size();
 					//cout << "Model size: " << model.size() << "\n";
+					//cout << "First element: " << model.data()[0] << "\n";
 					float* gpu_model;
 					cudaMalloc((void**) &gpu_model, num_models*sizeof(float));
-					cudaMemcpy(gpu_model, model.data(), num_models*sizeof(float), cudaMemcpyHostToDevice);
+					cudaMemcpy(gpu_model, cpu_model, num_models*sizeof(float), cudaMemcpyHostToDevice);
 
 
            				float* gpu_scores;
 					cudaMalloc((void**) &gpu_scores, num_seq*sizeof(float));
 
 					//For each read calculate the score for the model
-					//for(int i=0; i<reads->getSequences().size(); i++) {
 					// Call with num_seq blocks of order threads.
-					// Shared memory array size is read_length / order + 1
-					scoreReads<<<num_seq, order, read_length/order+1>>>(gpu_genome, read_length, order, gpu_model, gpu_scores);
+					int num_kmers = read_length - order + 1 + 1;
+					//printf("Calling kernel.\n");
+					//cout << "Using " << num_seq << " blocks of " << num_kmers << " threads.  Shared memory contains " << num_kmers << " floats." << endl;
+					scoreReads<<<num_seq, num_kmers, num_kmers*sizeof(float)>>>(gpu_genome, read_length, order, gpu_model, gpu_scores);
+					cudaDeviceSynchronize();
+					//printf("Called kernel.\n");
+					cudaError_t error = cudaGetLastError();
+  if(error != cudaSuccess)
+  {
+    // print the CUDA error message and exit
+    printf("CUDA error: %s\n", cudaGetErrorString(error));
+    exit(-1);
+  }
 
 					cudaMemcpy(cpu_scores, gpu_scores, num_seq*sizeof(float), cudaMemcpyDeviceToHost);
-
+					//if (cpu_scores[0] != cpu_scores[1])
+                                        //   cout << "Warning: Sequence 0 has " << cpu_scores[0] << " and Sequence 1 has " << cpu_scores[1] << endl;
+					cudaFree(gpu_model);
+					cudaFree(gpu_scores);
+					free(cpu_model);
+					for(int i=0; i<reads->getSequences().size(); i++) {
 						//tmpScore = this->scoreRead((string)reads->getSequences().at(i), order, kmers->getKmerList(), model);
-						//cout << "Score for read "<< i << ": " << tmpScore << "\n";
+						//cout << "Score for read "<< i << ": " << cpu_scores[i] << "\n";
 
 						//Replace the score stored if the new score is higher
 						// TMC for now removing, since we are only doing one model
-						/*if(this->scores.size() < reads->getSequences().size()) {
-							this->scores.push_back(tmpScore);
+						//cout << "Score for sequence " << i << " (press return to continue): " << cpu_scores[i] << endl;
+						//int x;cin >> x;
+						if(this->scores.size() < reads->getSequences().size()) {
+							this->scores.push_back(cpu_scores[i]);
 							this->modelNames.push_back((string)modelName.substr(0,modelName.find(".")));
 						}
 						else {
-							if (tmpScore > this->scores.at(i)) {
-								this->scores.at(i) = tmpScore;
+							if (cpu_scores[i] > this->scores.at(i)) {
+								this->scores.at(i) = cpu_scores[i];
 								this->modelNames.at(i) = modelName.substr(0,modelName.find("."));
 							}
-						}*/
-
-					//} //End while scoring reads
+						}
+			//			exit(1);
+					} //End while scoring reads
 				} catch(...) {}
 
 				modelFile.close();
+				//cout << "Model cleared." << endl;
 				model.clear();
 			} //End if model was loaded
 		} //End while reading models
@@ -168,8 +202,8 @@ void CScore::scoreModels(string modelsPath, string readsFileName, string outputF
 		scoreResults.open(outputFile.c_str());
 		if (scoreResults.is_open()) {
 			scoreResults << "Best score\tBest model\n";
-			for(int i=0; i < num_seq; /*i<this->scores.size();*/ i++) {
-				scoreResults << cpu_scores[i] /*this->scores.at(i)*/ << "\t" << modelName /*this->modelNames.at(i)*/ << "\n";
+			for(int i=0; i < this->scores.size(); i++) {
+				scoreResults << this->scores.at(i) << "\t" << this->modelNames.at(i) << "\n";
 			}
 			scoreResults.close();
 		}

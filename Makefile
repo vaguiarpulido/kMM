@@ -9,6 +9,9 @@ CFILES =        CKmers.cpp \
         CModel.cpp \
         CSequences.cpp \
         CScore.cpp \
+	#CScore.cu \
+	#scoreGenome.cpp \
+	#extractKmers.cpp \
         #scoreGenome.cpp \
         test.cpp
 
@@ -17,10 +20,15 @@ OFILES =        CKmers.o \
         CSequences.o \
         CScore.o \
 	scoreReads.o \
+	scoreGenome.o \
+	#extractKmers.o \
         #scoreGenome.o \
         test.o
 
-all:	${OFILES}
+all:	${OFILES} main
+
+main:	${OFILES}
+	nvcc ${OFILES} -o main
 #test:   test.o $(OFILES)
 #	$(CC) -o test $(OFILES)
 
@@ -35,6 +43,15 @@ CModel.o:       CModel.h CModel.cpp
 
 CSequences.o:       CSequences.h CSequences.cpp
 	$(CC) -c CSequences.cpp
+
+#extractKmers.o:       extractKmers.cpp
+#	$(CC) -c extractKmers.cpp
+
+scoreGenome.o:       scoreGenome.cpp
+	$(CC) -c scoreGenome.cpp
+
+#CScore.o:	CScore.h CScore.cu
+#	nvcc -c CScore.cu
 
 CScore.o:       CScore.h CScore.cpp
 	$(CC) -c CScore.cpp
