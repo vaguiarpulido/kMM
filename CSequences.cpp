@@ -5,7 +5,7 @@
  *      			Florida International University (FIU)
  *      			Miami, FL, USA
  *
- *     	Contact: 	vaguiarp@fiu.edu or vaguiarpulido@gmail.com
+ *     	Contact: 	vaguiarp@fiu.edu or giri@cs.fiu.edu
  */
 
 #include "CSequences.h"
@@ -72,10 +72,29 @@ vector<string> CSequences::getSequences() {
 	return this->sequences;
 }
 
-/*
-int main(int argc, char *argv[]) {
-	CSequences *reads = new CSequences("test.txt");
-	reads->getSequences();
-	reads->~CSequences();
+char * CSequences::getGenome() {
+  if (!input.is_open()) {
+    cout << "Could not open genome file " << endl;
+    return 0;
+  }
+
+  char ch;
+  string genome;
+  getline(input, genome);
+  genome = ""; // discard first line
+  while (input.get(ch)) {
+    if (ch != '\n') {
+      genome.push_back(ch);
+    }
+  }
+
+  int len = genome.length();
+  char* genomeSeq = new char[len];
+  strcpy(genomeSeq, genome.c_str());
+  for (int i = 0; i < 100; i++) {
+    cout << genomeSeq[i];
+  }
+  cout << endl << "Genome of length " << len << " read in" << endl;
+
+  return genomeSeq;
 }
-*/

@@ -14,25 +14,32 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <string.h>
 #include <vector>
 #include <math.h>
+#include <sys/time.h>
 #include "CKmers.h"
-using namespace std;
+using namespace std; 
 
 class CModel {
 public:
-	CModel(int order);
-	virtual ~CModel();
-	void buildModel(string genome, string outputName);
+  CModel(int order);
+  CModel(char * fName, int order); // read model from file fName
+  CModel(const CModel & m); // copy model m and decrement order by 1
+  virtual ~CModel();
+
+  int size; // size of logProbabilities = 4^{k+1} + 4^k
+
+  void buildModel(char * genome, char * outputName);
+  int mapKmer(char * str, int loc, int len);
+  int updateMapKmer(char * str, int loc, int len, int prevVal);
+  void printModel(char * outFileName);
 
 private:
-	int order;
-	vector<int> frequency;
-	vector<float> logProbabilities;
-	CKmers* kmers;
+  int order;
+  float * logProbabilities;
 
-	void calculateFrequencies(string genome);
-	void calculateProbabilities();
+  void calcFreqsProbs(char * genome);
 };
 
 #endif /* CMODEL_H_ */
