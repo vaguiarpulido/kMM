@@ -8,8 +8,8 @@ HFILES =        CKmers.h \
 CFILES =        CKmers.cpp \
         CModel.cpp \
         CSequences.cpp \
-        CScore.cpp \
-	#CScore.cu \
+	CScore.cu \
+        #CScore.cpp \
 	#scoreGenome.cpp \
 	#extractKmers.cpp \
         #scoreGenome.cpp \
@@ -47,11 +47,14 @@ CModel.o:       CModel.h CModel.cpp
 scoreGenome.o:       scoreGenome.cpp
 	$(CC) -c scoreGenome.cpp
 
-#CScore.o:	CScore.h CScore.cu
-#	nvcc -c CScore.cu
+scoreReads.o:	scoreReads.cu
+	nvcc -c scoreReads.cu
 
-CScore.o:       CScore.h CScore.cpp
-	$(CC) -c CScore.cpp
+CScore.o:	CScore.h CScore.cu
+	nvcc -c CScore.cu
+
+#CScore.o:       CScore.h CScore.cpp
+#	$(CC) -c CScore.cpp
 
 test5:	test5.o $(OFILES)
 	$(CC) -o test5 $(OFILES) test5.o
@@ -59,8 +62,8 @@ test5:	test5.o $(OFILES)
 test5.o:	CModel.h CSequences.h test5.cpp
 	$(CC) -c test5.cpp
 
-CModel.o:	CModel.h CModel.cpp
-	$(CC) -c CModel.cpp
+#CModel.o:	CModel.h CModel.cpp
+#	$(CC) -c CModel.cpp
 
 CSequences.o:	CSequences.h CSequences.cpp
 	$(CC) -c CSequences.cpp
@@ -72,8 +75,8 @@ CSequences.o:	CSequences.h CSequences.cpp
 # %.o:	%.cpp %.h
 # 	$(CC) -c $(input)
 
-# clean:
-# 	rm -f *~ *.o ; cd ds ; make -f Makefile clean ; cd ..
+clean:
+	rm -f *~ *.o
 
 # cleanall:
 # 	rm -f *~ *.o *.a; cd ds ; make -f Makefile cleanall ; cd ..
